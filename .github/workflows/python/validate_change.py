@@ -8,9 +8,17 @@ def validate_change(pr_raiser_login, change):
     personal_cla_file = 'personal_contributor_licence_agreement.md'
     employer_cla_file = 'employer_contributor_license_agreement.md'
     # validation code here
-    return False
+    # print("pr_raiser:",pr_raiser_login)
+    user_start =  change.find('[')
+    user_end = change.find(']')
+    login_user = change[user_start+1:user_end]
+    if(pr_raiser_login != login_user):
+        return EXPECTED_ERROR_MESSAGE + 'Github username should be same as pull request user name'
+    
+    return True
 
 # user names should be valid
+
 EXPECTED_ERROR_MESSAGE = "Error: The expected line should be: | `full name` | [naren](https://github.com/naren) | 14-july-2021 | \n"
 assert validate_change('naren', "+| `full name`| [some_wrong_user](https://github.com/naren) |14-july-2021|") == EXPECTED_ERROR_MESSAGE + 'Github username should be same as pull request user name'
 assert validate_change('naren', "+| `full name`| [naren](https://github.com/some_wrong_user) |14-july-2021|") == EXPECTED_ERROR_MESSAGE + 'Github username should be same as pull request user name'
