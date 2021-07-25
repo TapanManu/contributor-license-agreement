@@ -1,6 +1,9 @@
 # The line is of the format "+| `full name`| [gitLogin](https://github.com/gitLogin) |12-july-2021|"
 from os import error
+from datetime import date
 
+months = ["january","february","march","april","may","june","july",
+            "august","september","october","november","december"]
 
 # Change line is of the format "+| `full name`| [pr_raiser_login](https://github.com/pr_raiser_login) |12-july-2021|"
 
@@ -20,13 +23,35 @@ def validate_change(pr_raiser_login, change):
         github_user_start = change.find('/',github_user_start+1)
 
     user_name = change[github_user_start+1:github_user_end]
-    
-    
+
+    full_name_loc = change.find('|')
+    full_name_loc_next = change.find('|',full_name_loc+1)
+
+    full_name = change[full_name_loc+2:full_name_loc_next] 
+
+    if full_name != "`full name`":
+        return EXPECTED_ERROR_MESSAGE + "please use `full name` instead of 'full name'"
     if(pr_raiser_login != login_user):
         return EXPECTED_ERROR_MESSAGE + 'Github username should be same as pull request user name'
     if(pr_raiser_login != user_name):
         return EXPECTED_ERROR_MESSAGE + 'Github username should be same as pull request user name'
+
+    # compare dates
+    date_start = change.find('|',full_name_loc_next+1)
+    date_end = change.find('|',date_start+1)
+    Date = change[date_start+1:date_end]  
     
+    try:
+        day,month,year = Date.split('-')
+        login_day = date(int(year),months.index(month.lower())+1,int(day))
+    except:
+        return DATE_ERROR_MESSAGE
+        
+    today = date.today()
+    diff = today - login_day
+    if(diff.days > 7):
+        return DATE_ERROR_MESSAGE
+        
     return True
 
 # user names should be valid
