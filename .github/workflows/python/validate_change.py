@@ -8,11 +8,23 @@ def validate_change(pr_raiser_login, change):
     personal_cla_file = 'personal_contributor_licence_agreement.md'
     employer_cla_file = 'employer_contributor_license_agreement.md'
     # validation code here
-    # print("pr_raiser:",pr_raiser_login)
+    
     user_start =  change.find('[')
     user_end = change.find(']')
     login_user = change[user_start+1:user_end]
+
+    github_user_start = github_user_end = -1
+    for i in range(0,1):
+        github_user_end = change.find(')',github_user_end+1)
+    for _ in range(0,3):
+        github_user_start = change.find('/',github_user_start+1)
+
+    user_name = change[github_user_start+1:github_user_end]
+    
+    
     if(pr_raiser_login != login_user):
+        return EXPECTED_ERROR_MESSAGE + 'Github username should be same as pull request user name'
+    if(pr_raiser_login != user_name):
         return EXPECTED_ERROR_MESSAGE + 'Github username should be same as pull request user name'
     
     return True
